@@ -136,7 +136,9 @@ public class Main {
 
             // -- —— option 2: load país data —— --
             if (option.equals("2")) {
-                break;
+                for (Pais p : paises) {
+                    System.out.println(p);
+                }
             }
 
             // -- —— option 3: load cidade data —— --
@@ -151,7 +153,9 @@ public class Main {
 
             // -- —— option 5: load relatório —— --
             if (option.equals("5")) {
-                break;
+                for (InputInvalido error : relatorio) {
+                    System.out.println(error);
+                }
             }
 
             // -- —— option 6: exit program —— --
