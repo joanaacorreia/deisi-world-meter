@@ -1,4 +1,4 @@
-package ulusofona.aed.deisiworldmeter;
+package pt.ulusofona.aed.deisiworldmeter;
 
 public class InputInvalido {
     String nome;
