@@ -1,4 +1,4 @@
-package ulusofona.aed.deisiworldmeter;
+package pt.ulusofona.aed.deisiworldmeter;
 
 public class Pais {
     String nome;

@@ -1,4 +1,4 @@
-package ulusofona.aed.deisiworldmeter;
+package pt.ulusofona.aed.deisiworldmeter;
 
 public enum TipoEntidade {
     PAIS,
