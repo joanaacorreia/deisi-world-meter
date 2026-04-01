@@ -241,7 +241,7 @@ public class Main {
             }
             reader.close();
 
-            InputInvalido relatorioInfo = new InputInvalido("test-cidades.csv", validLines, invalidLines, firstInvalidLine);
+            InputInvalido relatorioInfo = new InputInvalido("test-populacao.csv", validLines, invalidLines, firstInvalidLine);
             relatorio.add(relatorioInfo);
 
             return true;
@@ -350,6 +350,7 @@ public class Main {
                 System.out.println();
                 System.out.println(String.format("%-20s | %-10s | %-10s | %-10s",
                         "Ficheiro", "Válidas", "Inválidas", "1ª Linha Inválida"));
+                System.out.println("——————————————————————————————————————————————————————————————————");
                 for (InputInvalido error : relatorio) {
                     System.out.println(error);
                 }
