@@ -17,6 +17,10 @@ public class Pais {
         return this.alfa2;
     }
 
+    public int getId() {
+        return this.id;
+    }
+
     @Override
     public String toString() {
         return nome + " | " + id + " | " + alfa2.toUpperCase() + " | " + alfa3.toUpperCase();

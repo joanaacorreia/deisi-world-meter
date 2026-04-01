@@ -30,23 +30,30 @@ public class Main {
         // resets lists before each load to avoid duplicates
         paises.clear();
         cidades.clear();
+        populacoes.clear();
         relatorio.clear();
 
         File folder = new File(rootFolder, "test-files");
 
         // read paises
-        File paisesFile = new File(folder, "test-paises.csv");
-        boolean paisesSuccessful = readPaises(paisesFile);
-
-        // read cidades if paises loaded successfully
-        if (paisesSuccessful) {
-            File cidadesFile = new File(folder, "test-cidades.csv");
-            return readCidades(cidadesFile);
+        boolean paisesSuccessful = readPaises(new File(folder, "test-paises.csv"));
+        if (!paisesSuccessful) {
+            return false;
         }
 
-        return false;
+        // read cidades
+        boolean cidadesSuccessful = readCidades(new File(folder, "test-cidades.csv"));
+        if (!cidadesSuccessful) {
+            return false;
+        }
+
+        // read populações
+        return readPopulacoes(new File(folder, "test-populacao.csv"));
     }
 
+    // ---------------------------------------------------------
+    // FILE READERS
+    // ---------------------------------------------------------
     // -- —— specific reader for paises.csv —— --
     private static boolean readPaises(File file) {
         int validLines = 0;
@@ -70,7 +77,7 @@ public class Main {
 
                 if (data.length == 4) {
                     // valid row
-                    int id = Integer.parseInt(data[0]); // convert first column data into int
+                    int id = Integer.parseInt(data[0]);
                     String alfa2 = data[1];
                     String alfa3 = data[2];
                     String nome = data[3];
@@ -100,7 +107,6 @@ public class Main {
             return true;
 
         } catch (Exception e) {
-            e.printStackTrace();
             // error opening or reading file
             return false;
         }
@@ -137,7 +143,7 @@ public class Main {
                         // handle empty population
                         int populacao = 0;
                         if (!data[3].isEmpty()) {
-                            // first parse as double then to int
+                            // first parse as double, then int
                             populacao = (int) Double.parseDouble(data[3]);
                         }
 
@@ -181,10 +187,88 @@ public class Main {
         }
     }
 
-    // -- —— helper method to check if country code exists —— --
+    // -- —— specific reader for populacao.csv —— --
+    private static boolean readPopulacoes(File file) {
+        int validLines = 0;
+        int invalidLines = 0;
+        int firstInvalidLine = -1;
+        int currentLine = 1;
+
+        try {
+            Scanner reader = new Scanner(file);
+
+            // skip header row (line 1)
+            if (reader.hasNextLine()) {
+                reader.nextLine();
+                currentLine++;
+            }
+
+            while (reader.hasNextLine()) {
+                String row = reader.nextLine();
+                String[] data = row.split(",");
+
+                if (data.length == 5) {
+                    try {
+                        int id = Integer.parseInt(data[0].trim());
+                        String ano = data[1].trim();
+                        long masculina = Long.parseLong(data[2].trim());
+                        long feminina = Long.parseLong(data[3].trim());
+                        double densidade = Double.parseDouble((data[4].trim()));
+
+                        // validates if país id exists first
+                        if (paisIdExists(id)) {
+                            populacoes.add(new Populacao(id, ano, masculina, feminina, densidade));
+                            validLines++;
+                        } else {
+                            invalidLines++;
+                            if (firstInvalidLine == -1) {
+                                firstInvalidLine = currentLine;
+                            }
+                        }
+                    } catch (NumberFormatException e) {
+                        invalidLines++;
+                        if (firstInvalidLine == -1) {
+                            firstInvalidLine = currentLine;
+                        }
+                    }
+                } else {
+                    invalidLines++;
+                    if (firstInvalidLine == -1) {
+                        firstInvalidLine = currentLine;
+                    }
+                }
+                currentLine++;
+            }
+            reader.close();
+
+            InputInvalido relatorioInfo = new InputInvalido("test-cidades.csv", validLines, invalidLines, firstInvalidLine);
+            relatorio.add(relatorioInfo);
+
+            return true;
+
+        } catch (Exception e) {
+            // error opening or reading file
+            return false;
+        }
+    }
+
+    // ---------------------------------------------------------
+    // SEARCHING HELPER METHODS
+    // ---------------------------------------------------------
+    // -- —— check if country alfa2 code exists —— --
     public static boolean paisExists(String alfa2) {
         for (Pais p : paises) {
             if (p.getAlfa2().equals(alfa2)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // -- —— check if country id code exists —— --
+    public static boolean paisIdExists(int id) {
+        for (Pais p : paises) {
+            if (p.getId() == id) {
                 return true;
             }
         }
@@ -241,7 +325,9 @@ public class Main {
 
             // -- —— option 4: load população data —— --
             if (option.equals("4")) {
-                break;
+                for (Populacao p : populacoes) {
+                    System.out.println(p);
+                }
             }
 
             // -- —— option 5: load relatório —— --
@@ -255,7 +341,6 @@ public class Main {
             if (option.equals("6")) {
                 break;
             }
-
         }
 
         input.close();
