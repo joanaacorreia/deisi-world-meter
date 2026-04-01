@@ -13,6 +13,10 @@ public class Pais {
         this.alfa3 = alfa3;
     }
 
+    public String getAlfa2() {
+        return this.alfa2;
+    }
+
     @Override
     public String toString() {
         return nome + " | " + id + " | " + alfa2.toUpperCase() + " | " + alfa3.toUpperCase();
