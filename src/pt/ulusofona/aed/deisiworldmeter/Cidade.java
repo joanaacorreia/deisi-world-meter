@@ -19,6 +19,7 @@ public class Cidade {
 
     @Override
     public String toString() {
-        return alfa2.toUpperCase() + " | " + nome + " | " + regiao + " | " + populacao + " | (" + latitude + ", " + longitude + ")";
+        return String.format("%-5s | %-20s | %-10s | %-10d | (%.4f, %.4f)",
+                alfa2.toUpperCase(), nome, regiao, populacao, latitude, longitude);
     }
 }

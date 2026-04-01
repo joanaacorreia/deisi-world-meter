@@ -15,6 +15,7 @@ public class InputInvalido {
 
     @Override
     public String toString() {
-        return nome + " | " + validos + " | " + invalidos + " | " + primeiroInvalido;
+        return String.format("%-20s | %-10d | %-10d | %-10d",
+                nome, validos, invalidos,primeiroInvalido);
     }
 }

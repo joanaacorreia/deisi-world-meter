@@ -311,30 +311,49 @@ public class Main {
 
             // -- —— option 2: load país data —— --
             if (option.equals("2")) {
+                System.out.println();
+                System.out.println(String.format("%-20s | %-5s | %-5s | %-5s",
+                        "Nome", "ID", "Alfa2", "Alfa3"));
+                System.out.println("————————————————————————————————————————————");
                 for (Pais p : paises) {
                     System.out.println(p);
                 }
+                System.out.println();
             }
 
             // -- —— option 3: load cidade data —— --
             if (option.equals("3")) {
+                System.out.println();
+                System.out.println(String.format("%-5s | %-20s | %-10s | %-10s | %-20s",
+                        "Alfa2", "Cidade", "Regiao", "População", "Coordenadas"));
+                System.out.println("———————————————————————————————————————————————————————————————————————————");
                 for (Cidade c : cidades) {
                     System.out.println(c);
                 }
+                System.out.println();
             }
 
             // -- —— option 4: load população data —— --
             if (option.equals("4")) {
+                System.out.println();
+                System.out.println(String.format("%-5s | %-10s | %-20s | %-20s | %-10s",
+                        "ID", "Ano", "Pop. Masculina", "Pop. Feminina", "Densidade"));
+                System.out.println("————————————————————————————————————————————————————————————————————————————");
                 for (Populacao p : populacoes) {
                     System.out.println(p);
                 }
+                System.out.println();
             }
 
             // -- —— option 5: load relatório —— --
             if (option.equals("5")) {
+                System.out.println();
+                System.out.println(String.format("%-20s | %-10s | %-10s | %-10s",
+                        "Ficheiro", "Válidas", "Inválidas", "1ª Linha Inválida"));
                 for (InputInvalido error : relatorio) {
                     System.out.println(error);
                 }
+                System.out.println();
             }
 
             // -- —— option 6: exit program —— --

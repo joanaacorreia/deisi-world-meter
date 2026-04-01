@@ -17,6 +17,7 @@ public class Populacao {
 
     @Override
     public String toString() {
-        return id + " | " + ano + " | " + masculina + " | " + feminina + " | " + densidade;
+        return String.format("%-5s | %-10s | %-20s | %-20s | %-10.2f",
+                id, ano, masculina, feminina, densidade);
     }
 }

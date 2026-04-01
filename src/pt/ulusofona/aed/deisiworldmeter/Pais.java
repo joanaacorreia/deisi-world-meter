@@ -23,6 +23,7 @@ public class Pais {
 
     @Override
     public String toString() {
-        return nome + " | " + id + " | " + alfa2.toUpperCase() + " | " + alfa3.toUpperCase();
+        return String.format("%-20s | %-5d | %-5s | %-5s",
+                nome, id, alfa2.toUpperCase(), alfa3.toUpperCase());
     }
 }
