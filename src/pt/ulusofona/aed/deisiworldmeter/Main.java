@@ -72,11 +72,12 @@ public class Main {
             // process file line by line
             while (reader.hasNextLine()) {
                 String row = reader.nextLine();
-                if (row.trim().isEmpty()) { // Ignorar linhas vazias
+                if (row.trim().isEmpty()){
                     continue;
                 }
 
-                String[] data = row.split(",");
+                // O "-1" obriga a contar todas as colunas, mesmo vazias
+                String[] data = row.split(",", -1);
 
                 if (data.length == 4) {
                     try {
@@ -85,12 +86,12 @@ public class Main {
                         String alfa3 = data[2].trim();
                         String nome = data[3].trim();
 
-                        // Verificar se os campos não estão vazios
-                        if (!alfa2.isEmpty() && !alfa3.isEmpty() && !nome.isEmpty()) {
+                        // Só é válido se o nome não estiver vazio
+                        if (!nome.isEmpty()) {
                             paises.add(new Pais(nome, id, alfa2, alfa3));
                             validLines++;
                         } else {
-                            // Caso falte um campo de texto, conta como inválida
+
                             invalidLines++;
                             if (firstInvalidLine == -1){
                                 firstInvalidLine = currentLine;
@@ -103,7 +104,6 @@ public class Main {
                         }
                     }
                 } else {
-                    // Linha com número de colunas errado
                     invalidLines++;
                     if (firstInvalidLine == -1) {
                         firstInvalidLine = currentLine;
