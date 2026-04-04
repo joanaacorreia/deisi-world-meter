@@ -27,28 +27,27 @@ public class Main {
     // FILE MANAGEMENT
     // ---------------------------------------------------------
     public static boolean parseFiles(File rootFolder) {
-        // resets lists before each load to avoid duplicates
+        // 1. Limpeza obrigatória
         paises.clear();
         cidades.clear();
         populacoes.clear();
         relatorio.clear();
 
-        File folder = new File(rootFolder, "test-files");
-
-        // read paises
-        boolean paisesSuccessful = readPaises(new File(folder, "test-paises.csv"));
-        if (!paisesSuccessful) {
+        // 2. Tentar ler diretamente da rootFolder (sem subpastas)
+        // O JUnit vai passar o caminho onde os ficheiros estão
+        boolean okPaises = readPaises(new File(rootFolder, "paises.csv"));
+        if (!okPaises){
             return false;
         }
 
-        // read cidades
-        boolean cidadesSuccessful = readCidades(new File(folder, "test-cidades.csv"));
-        if (!cidadesSuccessful) {
+        boolean okCidades = readCidades(new File(rootFolder, "cidades.csv"));
+        if (!okCidades){
             return false;
         }
 
-        // read populações
-        return readPopulacoes(new File(folder, "test-populacao.csv"));
+        boolean okPop = readPopulacoes(new File(rootFolder, "populacao.csv"));
+
+        return okPop;
     }
 
     // ---------------------------------------------------------
@@ -73,41 +72,56 @@ public class Main {
             // process file line by line
             while (reader.hasNextLine()) {
                 String row = reader.nextLine();
+                if (row.trim().isEmpty()) { // Ignorar linhas vazias
+                    continue;
+                }
+
                 String[] data = row.split(",");
 
                 if (data.length == 4) {
-                    // valid row
-                    int id = Integer.parseInt(data[0]);
-                    String alfa2 = data[1];
-                    String alfa3 = data[2];
-                    String nome = data[3];
+                    try {
+                        int id = Integer.parseInt(data[0].trim());
+                        String alfa2 = data[1].trim();
+                        String alfa3 = data[2].trim();
+                        String nome = data[3].trim();
 
-                    // create object to add to memory
-                    Pais p = new Pais(nome, id, alfa2, alfa3);
-                    paises.add(p);
-                    validLines++;
-
+                        // Verificar se os campos não estão vazios
+                        if (!alfa2.isEmpty() && !alfa3.isEmpty() && !nome.isEmpty()) {
+                            paises.add(new Pais(nome, id, alfa2, alfa3));
+                            validLines++;
+                        } else {
+                            // Caso falte um campo de texto, conta como inválida
+                            invalidLines++;
+                            if (firstInvalidLine == -1){
+                                firstInvalidLine = currentLine;
+                            }
+                        }
+                    } catch (NumberFormatException e) {
+                        invalidLines++;
+                        if (firstInvalidLine == -1){
+                            firstInvalidLine = currentLine;
+                        }
+                    }
                 } else {
-                    // invalid row
+                    // Linha com número de colunas errado
                     invalidLines++;
-
-                    if (firstInvalidLine == -1) { // only save line num of first error
+                    if (firstInvalidLine == -1) {
                         firstInvalidLine = currentLine;
                     }
                 }
-
                 currentLine++;
             }
 
             reader.close();
 
-            InputInvalido relatorioInfo = new InputInvalido("test-paises.csv", validLines, invalidLines, firstInvalidLine);
+            InputInvalido relatorioInfo = new InputInvalido("paises.csv", validLines, invalidLines, firstInvalidLine);
             relatorio.add(relatorioInfo);
 
             return true;
 
         } catch (Exception e) {
             // error opening or reading file
+            System.out.println("Erro a ler: " + file.getAbsolutePath()); // Debug
             return false;
         }
     }
@@ -176,7 +190,7 @@ public class Main {
 
             reader.close();
 
-            InputInvalido relatorioInfo = new InputInvalido("test-cidades.csv", validLines, invalidLines, firstInvalidLine);
+            InputInvalido relatorioInfo = new InputInvalido("cidades.csv", validLines, invalidLines, firstInvalidLine);
             relatorio.add(relatorioInfo);
 
             return true;
@@ -218,6 +232,14 @@ public class Main {
                         // validates if país id exists first
                         if (paisIdExists(id)) {
                             populacoes.add(new Populacao(id, ano, masculina, feminina, densidade));
+
+                            // Incrementar o contador no país correspondente
+                            for (Pais p : paises) {
+                                if (p.getId() == id) {
+                                    p.incrementarDadosPopulacao();
+                                    break;
+                                }
+                            }
                             validLines++;
                         } else {
                             invalidLines++;
@@ -241,7 +263,7 @@ public class Main {
             }
             reader.close();
 
-            InputInvalido relatorioInfo = new InputInvalido("test-populacao.csv", validLines, invalidLines, firstInvalidLine);
+            InputInvalido relatorioInfo = new InputInvalido("populacao.csv", validLines, invalidLines, firstInvalidLine);
             relatorio.add(relatorioInfo);
 
             return true;

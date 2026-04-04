@@ -17,9 +17,13 @@ public class Cidade {
         this.longitude = longitude;
     }
 
+    //@Override
+    //public String toString() {
+    //    return String.format("%-5s | %-20s | %-10s | %-10d | (%.4f, %.4f)",
+    //            alfa2.toUpperCase(), nome, regiao, populacao, latitude, longitude);
+    //}
     @Override
     public String toString() {
-        return String.format("%-5s | %-20s | %-10s | %-10d | (%.4f, %.4f)",
-                alfa2.toUpperCase(), nome, regiao, populacao, latitude, longitude);
+        return nome + " | " + alfa2.toUpperCase() + " | " + regiao + " | " + populacao + " | (" + latitude + "," + longitude + ")";
     }
 }
