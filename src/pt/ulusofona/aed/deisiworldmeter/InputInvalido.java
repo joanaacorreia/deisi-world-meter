@@ -13,11 +13,6 @@ public class InputInvalido {
         this.primeiroInvalido = primeiroInvalido;
     }
 
-    //@Override
-    //public String toString() {
-    //    return String.format("%-20s | %-10d | %-10d | %-10d",
-    //            nome, validos, invalidos,primeiroInvalido);
-    //}
 
     @Override
     public String toString() {

@@ -26,19 +26,11 @@ public class Pais {
         return this.id;
     }
 
-    // @Override
-    // public String toString() {
-    //    return String.format("%-20s | %-5d | %-5s | %-5s",
-    //            nome, id, alfa2.toUpperCase(), alfa3.toUpperCase());
-    // }
-
 
     @Override
     public String toString() {
-        // Base comum de 4 elementos
         String resultado = nome + " | " + id + " | " + alfa2.toUpperCase() + " | " + alfa3.toUpperCase();
 
-        // O 5º elemento só aparece se ID > 700
         if (this.id > 700) {
             resultado += " | " + nRegistosPopulacao;
         }

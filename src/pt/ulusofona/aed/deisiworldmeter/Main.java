@@ -26,28 +26,26 @@ public class Main {
     // ---------------------------------------------------------
     // FILE MANAGEMENT
     // ---------------------------------------------------------
-    public static boolean parseFiles(File rootFolder) {
-        // 1. Limpeza obrigatória
+    public static boolean parseFiles(File folder) {
         paises.clear();
         cidades.clear();
         populacoes.clear();
         relatorio.clear();
 
-        // 2. Tentar ler diretamente da rootFolder (sem subpastas)
-        // O JUnit vai passar o caminho onde os ficheiros estão
-        boolean okPaises = readPaises(new File(rootFolder, "paises.csv"));
+
+        boolean okPaises = readPaises(new File(folder, "paises.csv"));
         if (!okPaises){
             return false;
         }
 
-        boolean okCidades = readCidades(new File(rootFolder, "cidades.csv"));
+        boolean okCidades = readCidades(new File(folder, "cidades.csv"));
         if (!okCidades){
             return false;
         }
 
-        boolean okPop = readPopulacoes(new File(rootFolder, "populacao.csv"));
+        boolean okPopulacao = readPopulacoes(new File(folder, "populacao.csv"));
 
-        return okPop;
+        return okPopulacao;
     }
 
     // ---------------------------------------------------------
@@ -87,7 +85,7 @@ public class Main {
                         String nome = data[3].trim();
 
                         // Só é válido se o nome não estiver vazio
-                        if (!nome.isEmpty()) {
+                        if (!nome.isEmpty() && !paisIdExists(id)) {
                             paises.add(new Pais(nome, id, alfa2, alfa3));
                             validLines++;
                         } else {
@@ -150,19 +148,15 @@ public class Main {
                 if (data.length == 6 && paisExists(data[0])) {
                     try {
                         // valid row
-                        String alfa2 = data[0];
-                        String nome = data[1];
-                        String regiao = data[2];
+                        String alfa2 = data[0].trim();
+                        String nome = data[1].trim();
+                        String regiao = data[2].trim();
 
-                        // handle empty population
-                        int populacao = 0;
-                        if (!data[3].isEmpty()) {
-                            // first parse as double, then int
-                            populacao = (int) Double.parseDouble(data[3]);
-                        }
+                        // A população é obrigatória! Se estiver vazia, lança NumberFormatException
+                        int populacao = (int) Double.parseDouble(data[3].trim());
 
-                        double latitude = Double.parseDouble(data[4]);
-                        double longitude = Double.parseDouble(data[5]);
+                        double latitude = Double.parseDouble(data[4].trim());
+                        double longitude = Double.parseDouble(data[5].trim());
 
                         // create object to add to memory
                         Cidade c = new Cidade(alfa2, nome, regiao, populacao, latitude, longitude);
