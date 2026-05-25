@@ -320,14 +320,94 @@ public class Main {
     }
 
     public static Result execute(String comando){
-        return new Result(true,null,"");
+        // ==================== QUIT ==========================
+        if(comando.equals("QUIT")){
+            return new Result(true,null,"!Closing the Program");
+        }
+
+        // ==================== HELP ==========================
+        if(comando.equals("HELP")){
+            String helpcommand = "======================================= \n" +
+                                 "Available commands: \n" +
+                                 "\"COUNT_CITIES\" <min_population> \n" +
+                                 "\"HELP\" - Shows this help message \n" +
+                                 "\"QUIT\" - Exits the program";
+            return new Result(true,null,helpcommand);
+        }
+
+        // ==================== COUNT_CITIES ==========================
+        if(comando.startsWith("COUNT_CITIES")){
+            String[] partes = comando.split(" ");
+
+            if (partes.length != 2){
+                return new Result(false, "Comando invalido",null);
+            }
+
+            try {
+                int minPopulacao = Integer.parseInt(partes[1].trim());
+                int count = 0;
+
+                for (Cidade c : cidades){
+                    if (c.populacao >= minPopulacao){
+                        count++;
+                    }
+                }
+
+                return new Result(true,null,"" + count + "");
+            }catch (NumberFormatException e){
+                return new Result(false, "Comando invalido", null);
+            }
+        }
+
+        // == Erro Final ==
+
+        return new Result(false,"Unknown Command" + comando,null);
     }
 
+    public static void main(String[] args) {
+        System.out.println("Welcome to Deisi World Meter");
+
+        long start = System.currentTimeMillis();
+        boolean parseOk = parseFiles(new File("."));
+        if (!parseOk){
+            System.out.println("Error Loading Files");
+            return;
+        }
+        long end = System.currentTimeMillis();
+
+        System.out.println("Loaded files in " + (end - start) + "ms");
+
+        Result result = execute("HELP");
+        System.out.println(result.result);
+
+        Scanner in = new Scanner(System.in);
+
+        String line;
+        do {
+            System.out.println(">");
+            line = in.nextLine();
+
+            if (line != null && !line.equals("Quit")){
+                start = System.currentTimeMillis();
+                result = execute(line);
+                end = System.currentTimeMillis();
+
+                if(!result.success){
+                    System.out.println("Error: " + result.error);
+                } else {
+                    System.out.println(result.result);
+                    System.out.println("(took " + (end - start) + " ms)");
+                }
+            }
+        } while (line != null && !line.equals("QUIT"));
+    }
 
     // ---------------------------------------------------------
     // USER INTERFACE
     // ---------------------------------------------------------
-    public static void main(String[] args) {
+    /*
+        public static void main(String[] args) {
+
         Scanner input = new Scanner(System.in);
 
         while (true) {
@@ -335,17 +415,17 @@ public class Main {
             System.out.println("            DEISI WORLD METER             ");
             System.out.println("==========================================");
             System.out.println("[1] Carregar Ficheiros");
-            System.out.println("[2] Listar Países");
+            System.out.println("[2] Listar Pa&iacute;ses");
             System.out.println("[3] Listar Cidades");
-            System.out.println("[4] Listar Populações");
-            System.out.println("[5] Relatório de Erros");
+            System.out.println("[4] Listar Popula&ccedil;&otilde;es");
+            System.out.println("[5] Relat&oacute;rio de Erros");
             System.out.println("[6] Sair");
             System.out.println("------------------------------------------");
-            System.out.print("Seleção > ");
+            System.out.print("Sele&ccedil;&atilde;o > ");
 
             String option = input.nextLine();
 
-            // -- —— option 1: load data —— --
+            // -- &mdash;&mdash; option 1: load data &mdash;&mdash; --
             if (option.equals("1")) {
                 long start = System.currentTimeMillis();
                 boolean parseSuccessful = parseFiles(new File("."));
@@ -358,55 +438,55 @@ public class Main {
                 }
             }
 
-            // -- —— option 2: load país data —— --
+            // -- &mdash;&mdash; option 2: load pa&iacute;s data &mdash;&mdash; --
             if (option.equals("2")) {
                 System.out.println();
                 System.out.println(String.format("%-20s | %-5s | %-5s | %-5s",
                         "Nome", "ID", "Alfa2", "Alfa3"));
-                System.out.println("————————————————————————————————————————————");
+                System.out.println("&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;");
                 for (Pais p : paises) {
                     System.out.println(p);
                 }
                 System.out.println();
             }
 
-            // -- —— option 3: load cidade data —— --
+            // -- &mdash;&mdash; option 3: load cidade data &mdash;&mdash; --
             if (option.equals("3")) {
                 System.out.println();
                 System.out.println(String.format("%-5s | %-20s | %-10s | %-10s | %-20s",
-                        "Alfa2", "Cidade", "Regiao", "População", "Coordenadas"));
-                System.out.println("———————————————————————————————————————————————————————————————————————————");
+                        "Alfa2", "Cidade", "Regiao", "Popula&ccedil;&atilde;o", "Coordenadas"));
+                System.out.println("&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;");
                 for (Cidade c : cidades) {
                     System.out.println(c);
                 }
                 System.out.println();
             }
 
-            // -- —— option 4: load população data —— --
+            // -- &mdash;&mdash; option 4: load popula&ccedil;&atilde;o data &mdash;&mdash; --
             if (option.equals("4")) {
                 System.out.println();
                 System.out.println(String.format("%-5s | %-10s | %-20s | %-20s | %-10s",
                         "ID", "Ano", "Pop. Masculina", "Pop. Feminina", "Densidade"));
-                System.out.println("————————————————————————————————————————————————————————————————————————————");
+                System.out.println("&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;");
                 for (Populacao p : populacoes) {
                     System.out.println(p);
                 }
                 System.out.println();
             }
 
-            // -- —— option 5: load relatório —— --
+            // -- &mdash;&mdash; option 5: load relat&oacute;rio &mdash;&mdash; --
             if (option.equals("5")) {
                 System.out.println();
                 System.out.println(String.format("%-20s | %-10s | %-10s | %-10s",
-                        "Ficheiro", "Válidas", "Inválidas", "1ª Linha Inválida"));
-                System.out.println("——————————————————————————————————————————————————————————————————");
+                        "Ficheiro", "V&aacute;lidas", "Inv&aacute;lidas", "1&ordf; Linha Inv&aacute;lida"));
+                System.out.println("&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;");
                 for (InputInvalido error : relatorio) {
                     System.out.println(error);
                 }
                 System.out.println();
             }
 
-            // -- —— option 6: exit program —— --
+            // -- &mdash;&mdash; option 6: exit program &mdash;&mdash; --
             if (option.equals("6")) {
                 break;
             }
@@ -414,4 +494,8 @@ public class Main {
 
         input.close();
     }
+
+     */
 }
+
+
