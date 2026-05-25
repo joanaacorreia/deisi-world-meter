@@ -330,12 +330,17 @@ public class Main {
             String helpcommand = "======================================= \n" +
                                  "Available commands: \n" +
                                  "\"COUNT_CITIES\" <min_population> \n" +
+                                 "\"GET_CITIES_BY_COUNTRY\" <num_results> <country_name> \n" +
                                  "\"HELP\" - Shows this help message \n" +
                                  "\"QUIT\" - Exits the program";
             return new Result(true,null,helpcommand);
         }
 
         // ==================== COUNT_CITIES ==========================
+        // Comportamento do Comando : Conta cidades com população >= a <min_populacao>
+        // 1. Dividir a string por partes divido por cada espaço " "
+        // 2. Verificar se o comando foi bem escrito neste caso tem duas partes COUNT_CITIES e <min_population>
+        // 3. Dentro de um try, catch passar pelas cidades e ver qual cidade a população é >= a <min_population> e a partir daí aumentar o count
         if(comando.startsWith("COUNT_CITIES")){
             String[] partes = comando.split(" ");
 
@@ -357,6 +362,58 @@ public class Main {
             }catch (NumberFormatException e){
                 return new Result(false, "Comando invalido", null);
             }
+        }
+
+        // ==================== GET_CITIES_BY_COUNTRY ==========================
+        if (comando.startsWith("GET_CITIES_BY_COUNTRY")){
+            String[] partes = comando.split(" ",3); // Limite 3 para se houver paises com espaço
+
+            if (partes.length != 3){
+                return new Result(false, "Comando invalido",null);
+            }
+
+            try {
+                 int numResults = Integer.parseInt(partes[1].trim());
+                 String nomePais = partes[2].trim();
+
+                 // Verificar se o país existe se não exister retornar "Pais invalido + ---"
+                boolean paisValido = false;
+                String alfa2Pais = null;
+
+                for (Pais p : paises){
+                    if (p.nome.equalsIgnoreCase(nomePais)){
+                        paisValido = true;
+                        alfa2Pais = p.getAlfa2();
+                        break;
+                    }
+                }
+
+                if (!paisValido){
+                    return new Result(false, "Pais invalido : " + nomePais, null);
+                }
+
+                // Encontrar a cidade para o país que o user deu
+                ArrayList<Cidade> cidadesDoPais = new ArrayList<>();
+                for (Cidade c : cidades){
+                    if (c.alfa2.equals(alfa2Pais)){
+                        cidadesDoPais.add(c);
+                    }
+                }
+
+                // Construir resultado só com os nomes das cidades
+                String resultado = "";
+                int limite = Math.min(numResults, cidadesDoPais.size());
+                for (int i = 0; i < limite; i++) {
+                    resultado += cidadesDoPais.get(i).nome + "\n";
+                }
+
+                return new Result(true, null, resultado);
+
+            }catch (NumberFormatException e){
+                return new Result(false, "Comando invalido", null);
+            }
+
+
         }
 
         // == Erro Final ==
