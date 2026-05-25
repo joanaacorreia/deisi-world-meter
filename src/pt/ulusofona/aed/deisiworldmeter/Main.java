@@ -278,7 +278,7 @@ public class Main {
     }
 
     // ---------------------------------------------------------
-    // SEARCHING HELPER METHODS
+    // SEARCHING HELPER METHODS -
     // ---------------------------------------------------------
     // -- —— check if country alfa2 code exists —— --
     public static boolean paisExists(String alfa2) {
