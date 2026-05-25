@@ -43,6 +43,15 @@ public class Main {
             return false;
         }
 
+        // Fase 2 - Remover países sem cidades
+        ArrayList<Pais> paisesFiltrados = new ArrayList<>();
+        for (Pais p : paises){
+            if (paisTemCidade(p.getAlfa2())) {
+                paisesFiltrados.add(p);
+            }
+        }
+        paises = paisesFiltrados;
+
         boolean okPopulacao = readPopulacoes(new File(folder, "populacao.csv"));
 
         return okPopulacao;
@@ -290,6 +299,30 @@ public class Main {
         }
         return false;
     }
+
+    // ---------------------------------------------------------
+    // FASE 2 --------------------------------------------------
+    // ---------------------------------------------------------
+
+
+    // Função Helper - Para o parseFiles() ignorar paises que não têm cidades
+    // Esta função vai entrar no parseFiles() para remover os países que não têm
+    // cidades do ArrayList dos países
+    public static boolean paisTemCidade(String alfa2){
+        // A partir do alfa2 no ficheiro paises.csv percorre os paises à
+        // procura de um alfa2 igual ou inexistente
+        for (Cidade c : cidades){
+            if (c.alfa2.equals(alfa2)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static Result execute(String comando){
+        return new Result(true,null,"");
+    }
+
 
     // ---------------------------------------------------------
     // USER INTERFACE
