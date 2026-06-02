@@ -34,18 +34,18 @@ public class Main {
 
 
         boolean okPaises = readPaises(new File(folder, "paises.csv"));
-        if (!okPaises){
+        if (!okPaises) {
             return false;
         }
 
         boolean okCidades = readCidades(new File(folder, "cidades.csv"));
-        if (!okCidades){
+        if (!okCidades) {
             return false;
         }
 
         // Fase 2 - Remover países sem cidades
         ArrayList<Pais> paisesFiltrados = new ArrayList<>();
-        for (Pais p : paises){
+        for (Pais p : paises) {
             if (paisTemCidade(p.getAlfa2())) {
                 paisesFiltrados.add(p);
             }
@@ -79,7 +79,7 @@ public class Main {
             // process file line by line
             while (reader.hasNextLine()) {
                 String row = reader.nextLine();
-                if (row.trim().isEmpty()){
+                if (row.trim().isEmpty()) {
                     continue;
                 }
 
@@ -100,13 +100,13 @@ public class Main {
                         } else {
 
                             invalidLines++;
-                            if (firstInvalidLine == -1){
+                            if (firstInvalidLine == -1) {
                                 firstInvalidLine = currentLine;
                             }
                         }
                     } catch (NumberFormatException e) {
                         invalidLines++;
-                        if (firstInvalidLine == -1){
+                        if (firstInvalidLine == -1) {
                             firstInvalidLine = currentLine;
                         }
                     }
@@ -308,32 +308,44 @@ public class Main {
     // Função Helper - Para o parseFiles() ignorar paises que não têm cidades
     // Esta função vai entrar no parseFiles() para remover os países que não têm
     // cidades do ArrayList dos países
-    public static boolean paisTemCidade(String alfa2){
+    public static boolean paisTemCidade(String alfa2) {
         // A partir do alfa2 no ficheiro paises.csv percorre os paises à
         // procura de um alfa2 igual ou inexistente
-        for (Cidade c : cidades){
-            if (c.alfa2.equals(alfa2)){
+        for (Cidade c : cidades) {
+            if (c.alfa2.equals(alfa2)) {
                 return true;
             }
         }
         return false;
     }
 
-    public static Result execute(String comando){
+    public static Result execute(String comando) {
         // ==================== QUIT ==========================
-        if(comando.equals("QUIT")){
-            return new Result(true,null,"!Closing the Program");
+        if (comando.equals("QUIT")) {
+            return new Result(true, null, "!Closing the Program");
         }
 
         // ==================== HELP ==========================
-        if(comando.equals("HELP")){
+        if (comando.equals("HELP")) {
             String helpcommand = "======================================= \n" +
-                                 "Available commands: \n" +
-                                 "\"COUNT_CITIES\" <min_population> \n" +
-                                 "\"GET_CITIES_BY_COUNTRY\" <num_results> <country_name> \n" +
-                                 "\"HELP\" - Shows this help message \n" +
-                                 "\"QUIT\" - Exits the program";
-            return new Result(true,null,helpcommand);
+                    "Available commands: \n" +
+                    "\"COUNT_CITIES\" <min_population> \n" +
+                    "\"GET_CITIES_BY_COUNTRY\" <num_results> <country_name> \n" +
+                    "\"SUM_POPULATIONS\" <countries_list> \n" +
+                    "\"GET_HISTORY\" <year_start> <year_end> <country_name> \n" +
+                    "\"GET_MISSING_HISTORY\" <year_start> <year_end> \n" +
+                    "\"GET_MOST_POPULOUS\" <num_results> \n" +
+                    "\"GET_TOP_CITIES_BY_COUNTRY\" <num_results> <country_name> \n" +
+                    "\"GET_DUPLICATE_CITIES\" <min_population> \n" +
+                    "\"GET_COUNTRIES_GENDER_GAP\" <min_gender_gap> \n" +
+                    "\"GET_TOP_POPULATION_INCREASE\" <year_start> <year_end> \n" +
+                    "\"GET_DUPLICATE_CITIES_DIFFERENT_COUNTRIES\" <min_population> \n" +
+                    "\"GET_CITIES_AT_DISTANCE\" <distance> <country_name> \n" +
+                    "\"INSERT_CITY\" <alfa2> <city_name> <region> <population> \n" +
+                    "\"REMOVE_COUNTRY\" <country_name> \n" +
+                    "\"HELP\" - Shows this help message \n" +
+                    "\"QUIT\" - Exits the program";
+            return new Result(true, null, helpcommand);
         }
 
         // ==================== COUNT_CITIES ==========================
@@ -341,61 +353,61 @@ public class Main {
         // 1. Dividir a string por partes divido por cada espaço " "
         // 2. Verificar se o comando foi bem escrito neste caso tem duas partes COUNT_CITIES e <min_population>
         // 3. Dentro de um try, catch passar pelas cidades e ver qual cidade a população é >= a <min_population> e a partir daí aumentar o count
-        if(comando.startsWith("COUNT_CITIES")){
+        if (comando.startsWith("COUNT_CITIES")) {
             String[] partes = comando.split(" ");
 
-            if (partes.length != 2){
-                return new Result(false, "Comando invalido",null);
+            if (partes.length != 2) {
+                return new Result(false, "Comando invalido", null);
             }
 
             try {
                 int minPopulacao = Integer.parseInt(partes[1].trim());
                 int count = 0;
 
-                for (Cidade c : cidades){
-                    if (c.populacao >= minPopulacao){
+                for (Cidade c : cidades) {
+                    if (c.populacao >= minPopulacao) {
                         count++;
                     }
                 }
 
-                return new Result(true,null,"" + count + "");
-            }catch (NumberFormatException e){
+                return new Result(true, null, "" + count + "");
+            } catch (NumberFormatException e) {
                 return new Result(false, "Comando invalido", null);
             }
         }
 
         // ==================== GET_CITIES_BY_COUNTRY ==========================
-        if (comando.startsWith("GET_CITIES_BY_COUNTRY")){
-            String[] partes = comando.split(" ",3); // Limite 3 para se houver paises com espaço
+        if (comando.startsWith("GET_CITIES_BY_COUNTRY")) {
+            String[] partes = comando.split(" ", 3); // Limite 3 para se houver paises com espaço
 
-            if (partes.length != 3){
-                return new Result(false, "Comando invalido",null);
+            if (partes.length != 3) {
+                return new Result(false, "Comando invalido", null);
             }
 
             try {
-                 int numResults = Integer.parseInt(partes[1].trim());
-                 String nomePais = partes[2].trim();
+                int numResults = Integer.parseInt(partes[1].trim());
+                String nomePais = partes[2].trim();
 
-                 // Verificar se o país existe se não exister retornar "Pais invalido + ---"
+                // Verificar se o país existe se não exister retornar "Pais invalido + ---"
                 boolean paisValido = false;
                 String alfa2Pais = null;
 
-                for (Pais p : paises){
-                    if (p.nome.equalsIgnoreCase(nomePais)){
+                for (Pais p : paises) {
+                    if (p.nome.equalsIgnoreCase(nomePais)) {
                         paisValido = true;
                         alfa2Pais = p.getAlfa2();
                         break;
                     }
                 }
 
-                if (!paisValido){
+                if (!paisValido) {
                     return new Result(false, "Pais invalido : " + nomePais, null);
                 }
 
                 // Encontrar a cidade para o país que o user deu
                 ArrayList<Cidade> cidadesDoPais = new ArrayList<>();
-                for (Cidade c : cidades){
-                    if (c.alfa2.equals(alfa2Pais)){
+                for (Cidade c : cidades) {
+                    if (c.alfa2.equals(alfa2Pais)) {
                         cidadesDoPais.add(c);
                     }
                 }
@@ -409,16 +421,107 @@ public class Main {
 
                 return new Result(true, null, resultado);
 
-            }catch (NumberFormatException e){
+            } catch (NumberFormatException e) {
                 return new Result(false, "Comando invalido", null);
             }
 
 
         }
 
+        // ==================== SUM_POPULATIONS ==========================
+        // Recebe uma lista de países separadao por vírgulas,  também se pode pedir um só país
+        // O comando pega nos países da lista e a partir do alfa ligado com o ficheiro populações
+        // vai buscar a população e soma a M e F de cada país
+        if (comando.startsWith("SUM_POPULATIONS")) {
+            String[] partes = comando.split(" ", 2);
+
+            if (partes.length != 2) {
+                return new Result(false, "Comando invalido", null);
+            }
+
+            String[] nomesPaises = partes[1].split(",");
+
+            long totalMasculina = 0;
+            long totalFeminina = 0;
+
+            for (String nomePais : nomesPaises) {
+                nomePais = nomePais.trim();
+
+                // Encontrar o país pelo nome
+                Pais paisEncontrado = null;
+                for (Pais p : paises) {
+                    if (p.nome.equalsIgnoreCase(nomePais)) {
+                        paisEncontrado = p;
+                        break;
+                    }
+                }
+
+                if (paisEncontrado == null) {
+                    return new Result(false, "Pais invalido : " + nomePais, null);
+                }
+
+                // Somar populações do país
+                for (Populacao pop : populacoes) {
+                    if (pop.id == paisEncontrado.getId()) {
+                        totalMasculina += pop.masculina;
+                        totalFeminina += pop.feminina;
+                    }
+                }
+            }
+
+            return new Result(true, null, totalMasculina + totalFeminina + "");
+        }
+
+        // ==================== GET_HISTORY ==========================
+        if (comando.startsWith("GET_HISTORY")) {
+
+        }
+        // ==================== GET_MISSING_HISTORY ==========================
+        if (comando.startsWith("GET_MISSING_HISTORY")) {
+
+        }
+        // ==================== GET_MOST_POPULOUS ==========================
+        if (comando.startsWith("GET_MOST_POPULOUS")) {
+
+        }
+        // ==================== GET_TOP_CITIES_BY_COUNTRY ==========================
+        if (comando.startsWith("GET_TOP_CITIES_BY_COUNTRY")) {
+
+        }
+        // ==================== GET_DUPLICATE_CITIES ==========================
+        if (comando.startsWith("GET_DUPLICATE_CITIES")) {
+
+        }
+        // ==================== GET_COUNTRIES_GENDER_GAP ==========================
+        if (comando.startsWith("GET_COUNTRIES_GENDER_GAP")) {
+
+        }
+        // ==================== GET_TOP_POPULATION_INCREASE ==========================
+        if (comando.startsWith("GET_TOP_POPULATION_INCREASE")) {
+
+        }
+        // ==================== GET_DUPLICATE_CITIES_DIFFERENT_COUNTRIES ==========================
+        if (comando.startsWith("GET_DUPLICATE_CITIES_DIFFERENT_COUNTRIES")) {
+
+        }
+        // ==================== GET_CITIES_AT_DISTANCE ==========================
+        if (comando.startsWith("GET_CITIES_AT_DISTANCE")) {
+
+        }
+        // ==================== INSERT_CITY ==========================
+        if (comando.startsWith("INSERT_CITY")) {
+
+        }
+        // ==================== REMOVE_COUNTRY ==========================
+        if (comando.startsWith("REMOVE_COUNTRY")) {
+
+        }
+        // ==================== Comando Criativo ==========================
+
+
         // == Erro Final ==
 
-        return new Result(false,"Unknown Command" + comando,null);
+        return new Result(false, "Unknown Command" + comando, null);
     }
 
     public static void main(String[] args) {
@@ -426,7 +529,7 @@ public class Main {
 
         long start = System.currentTimeMillis();
         boolean parseOk = parseFiles(new File("."));
-        if (!parseOk){
+        if (!parseOk) {
             System.out.println("Error Loading Files");
             return;
         }
@@ -444,12 +547,12 @@ public class Main {
             System.out.println(">");
             line = in.nextLine();
 
-            if (line != null && !line.equals("Quit")){
+            if (line != null && !line.equals("Quit")) {
                 start = System.currentTimeMillis();
                 result = execute(line);
                 end = System.currentTimeMillis();
 
-                if(!result.success){
+                if (!result.success) {
                     System.out.println("Error: " + result.error);
                 } else {
                     System.out.println(result.result);
@@ -458,101 +561,4 @@ public class Main {
             }
         } while (line != null && !line.equals("QUIT"));
     }
-
-    // ---------------------------------------------------------
-    // USER INTERFACE
-    // ---------------------------------------------------------
-    /*
-        public static void main(String[] args) {
-
-        Scanner input = new Scanner(System.in);
-
-        while (true) {
-            System.out.println("==========================================");
-            System.out.println("            DEISI WORLD METER             ");
-            System.out.println("==========================================");
-            System.out.println("[1] Carregar Ficheiros");
-            System.out.println("[2] Listar Pa&iacute;ses");
-            System.out.println("[3] Listar Cidades");
-            System.out.println("[4] Listar Popula&ccedil;&otilde;es");
-            System.out.println("[5] Relat&oacute;rio de Erros");
-            System.out.println("[6] Sair");
-            System.out.println("------------------------------------------");
-            System.out.print("Sele&ccedil;&atilde;o > ");
-
-            String option = input.nextLine();
-
-            // -- &mdash;&mdash; option 1: load data &mdash;&mdash; --
-            if (option.equals("1")) {
-                long start = System.currentTimeMillis();
-                boolean parseSuccessful = parseFiles(new File("."));
-                long end = System.currentTimeMillis();
-
-                if (parseSuccessful) {
-                    System.out.println("Lido com sucesso em " + (end - start) + "ms");
-                } else {
-                    System.out.println("Erro ao carregar ficheiros.");
-                }
-            }
-
-            // -- &mdash;&mdash; option 2: load pa&iacute;s data &mdash;&mdash; --
-            if (option.equals("2")) {
-                System.out.println();
-                System.out.println(String.format("%-20s | %-5s | %-5s | %-5s",
-                        "Nome", "ID", "Alfa2", "Alfa3"));
-                System.out.println("&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;");
-                for (Pais p : paises) {
-                    System.out.println(p);
-                }
-                System.out.println();
-            }
-
-            // -- &mdash;&mdash; option 3: load cidade data &mdash;&mdash; --
-            if (option.equals("3")) {
-                System.out.println();
-                System.out.println(String.format("%-5s | %-20s | %-10s | %-10s | %-20s",
-                        "Alfa2", "Cidade", "Regiao", "Popula&ccedil;&atilde;o", "Coordenadas"));
-                System.out.println("&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;");
-                for (Cidade c : cidades) {
-                    System.out.println(c);
-                }
-                System.out.println();
-            }
-
-            // -- &mdash;&mdash; option 4: load popula&ccedil;&atilde;o data &mdash;&mdash; --
-            if (option.equals("4")) {
-                System.out.println();
-                System.out.println(String.format("%-5s | %-10s | %-20s | %-20s | %-10s",
-                        "ID", "Ano", "Pop. Masculina", "Pop. Feminina", "Densidade"));
-                System.out.println("&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;");
-                for (Populacao p : populacoes) {
-                    System.out.println(p);
-                }
-                System.out.println();
-            }
-
-            // -- &mdash;&mdash; option 5: load relat&oacute;rio &mdash;&mdash; --
-            if (option.equals("5")) {
-                System.out.println();
-                System.out.println(String.format("%-20s | %-10s | %-10s | %-10s",
-                        "Ficheiro", "V&aacute;lidas", "Inv&aacute;lidas", "1&ordf; Linha Inv&aacute;lida"));
-                System.out.println("&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;");
-                for (InputInvalido error : relatorio) {
-                    System.out.println(error);
-                }
-                System.out.println();
-            }
-
-            // -- &mdash;&mdash; option 6: exit program &mdash;&mdash; --
-            if (option.equals("6")) {
-                break;
-            }
-        }
-
-        input.close();
-    }
-
-     */
 }
-
-
