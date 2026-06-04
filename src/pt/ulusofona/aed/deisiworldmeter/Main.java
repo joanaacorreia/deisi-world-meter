@@ -474,6 +474,12 @@ public class Main {
 
         // ==================== GET_HISTORY ==========================
         if (comando.startsWith("GET_HISTORY")) {
+            String[] partes = comando.split(" ", 4);
+
+            if (partes.length != 4){
+                return new Result(false, "Comando invalido", null);
+            }
+
 
         }
         // ==================== GET_MISSING_HISTORY ==========================
