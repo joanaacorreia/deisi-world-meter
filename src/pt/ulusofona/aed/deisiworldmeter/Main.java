@@ -1,8 +1,7 @@
 package pt.ulusofona.aed.deisiworldmeter;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
 
@@ -484,14 +483,180 @@ public class Main {
         }
         // ==================== GET_MISSING_HISTORY ==========================
         if (comando.startsWith("GET_MISSING_HISTORY")) {
+            String[] pieces = comando.split(" ");
 
+            if (pieces.length != 3) {
+                return new Result(false, "Comando invalido", null);
+            }
+
+            try {
+                int yearStart = Integer.parseInt(pieces[1]);
+                int yearEnd = Integer.parseInt(pieces[2]);
+
+                // this hashset stores the existing data and creates a key for each consisting of it's country id and year
+                HashSet<String> existingData = new HashSet<>();
+                for (Populacao pop : populacoes) {
+                    String key = pop.id + "-" + pop.ano;
+                    existingData.add(key);
+                }
+
+                // —— -- SEARCH -- ——
+                StringBuilder resultStr = new StringBuilder();
+
+                // loops through the countries we know about
+                for (Pais p : paises) {
+                    boolean isMissingData = false;
+
+                    // loop from yearStart to yearEnd
+                    for (int year = yearStart; year <= yearEnd; year++) {
+                        // recreates key we're searching for
+                        String searchKey = p.getId() + "-" + year;
+
+                        // missing history means existingData will not contain searchKey
+                        if (!existingData.contains(searchKey)) {
+                            isMissingData = true;
+                            break;
+                        }
+                    }
+
+                    if (isMissingData) {
+                        resultStr.append(p.getAlfa2()).append(":").append(p.nome).append("\n");
+                    }
+                }
+
+                // —— -- OUTPUT -- ——
+                if (resultStr.isEmpty()) {
+                    return new Result(false, null, "Sem resultados");
+                } else {
+                    return new Result(true, null, resultStr.toString().trim());
+                }
+
+            } catch (NumberFormatException e) {
+                return new Result(false, "Comando invalido", null);
+            }
         }
         // ==================== GET_MOST_POPULOUS ==========================
         if (comando.startsWith("GET_MOST_POPULOUS")) {
+            String[] pieces = comando.split(" ");
+
+            if (pieces.length != 2) {
+                return new Result(false, "Comando invalido", null);
+            }
+
+            try {
+                int numResults = Integer.parseInt(pieces[1]);
+
+                // —— -- SORT -- ——
+                // new list containing the cities awaiting sort
+                ArrayList<Cidade> cidadesOrdenadas = new ArrayList<>(cidades);
+
+                Comparator<Cidade> populacaoComparator = new Comparator<Cidade>() {
+                    @Override
+                    public int compare(Cidade c1, Cidade c2) {
+                        // gets descending order
+
+                        /* explanation
+                         if (c1.populacao > c2.populacao) {
+                            return -1;
+                         } else if (c2.populacao > c1.populacao) {
+                            return 1;
+                         } else {
+                            return 0;
+                         }*/
+
+                        return c2.populacao - c1.populacao;
+                    }
+                };
+
+                Collections.sort(cidadesOrdenadas, populacaoComparator);
+
+                // —— -- FILTERING & OUTPUT -- ——
+                StringBuilder resultStr = new StringBuilder();
+                HashSet<String> paisesVistos = new HashSet<>();
+                int cidadesEncontradas = 0;
+
+                // Loop through our newly sorted list
+                for (Cidade c : cidadesOrdenadas) {
+                    if (paisesVistos.contains(c.alfa2)) {
+                        continue;
+                    }
+
+                    paisesVistos.add(c.alfa2);
+
+                    String nomePais = "";
+                    for (Pais p : paises) {
+                        if (p.getAlfa2().equalsIgnoreCase(c.alfa2)) {
+                            nomePais = p.nome;
+                        }
+                    }
+
+                    resultStr.append(nomePais).append(":").append(c.nome).append(":").append(c.populacao).append("\n");
+
+                    cidadesEncontradas++;
+                    if (cidadesEncontradas == numResults) {
+                        break;
+                    }
+                }
+
+                return new Result(true, null, resultStr.toString().trim());
+
+            } catch (NumberFormatException e) {
+                return new Result(false, "Comando invalido", null);
+            }
 
         }
         // ==================== GET_TOP_CITIES_BY_COUNTRY ==========================
         if (comando.startsWith("GET_TOP_CITIES_BY_COUNTRY")) {
+            String[] pieces = comando.split(" ", 3);
+
+            if (pieces.length != 3) {
+                return new Result(false, "Comando invalido", null);
+            }
+
+            try {
+                int numResults = Integer.parseInt(pieces[1]);
+                String nomePais = pieces[2].trim();
+
+                // —— -- FIND COUNTRY -- ——
+                String targetAlfa2 = null;
+                for (Pais p : paises) {
+                    if (p.nome.equalsIgnoreCase(nomePais)) {
+                        targetAlfa2 = p.getAlfa2();
+                        break;
+                    }
+                }
+
+                if (targetAlfa2 == null) {
+                    return new Result(false, "Pais invalido: " + nomePais, null);
+                }
+
+                // —— -- FILTER CITIES -- ——
+                ArrayList<Cidade> cidadesDoPais = new ArrayList<>();
+                for (Cidade c : cidades) {
+                    if (c.alfa2.equalsIgnoreCase(targetAlfa2)) {
+                        cidadesDoPais.add(c);
+                    }
+                }
+
+                // —— -- SORT -- ——
+                // sorts descending pop. if equal, sorted alphabetical by name
+                cidadesDoPais.sort(new Comparator<Cidade>() {
+                    @Override
+                    public int compare(Cidade c1, Cidade c2) {
+                        if (c1.populacao != c2.populacao) {
+                            return c2.populacao - c1.populacao; // pop desc
+                        }
+
+                        return c2.nome.compareTo(c1.nome); // name desc
+                    }
+                });
+
+                // —— -- OUTPUT -- ——
+                StringBuilder resultStr = new StringBuilder();
+                int limit = (numResults == -1) ? cidadesDoPais.size() : Math.min(numResults, cidadesDoPais.size());
+
+            }
+
 
         }
         // ==================== GET_DUPLICATE_CITIES ==========================
