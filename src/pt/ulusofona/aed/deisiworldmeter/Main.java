@@ -323,7 +323,6 @@ public class Main {
         if (comando.equals("QUIT")) {
             return new Result(true, null, "!Closing the Program");
         }
-
         // ==================== HELP ==========================
         if (comando.equals("HELP")) {
             String helpcommand = "======================================= \n" +
@@ -346,7 +345,6 @@ public class Main {
                     "\"QUIT\" - Exits the program";
             return new Result(true, null, helpcommand);
         }
-
         // ==================== COUNT_CITIES ==========================
         // Comportamento do Comando : Conta cidades com população >= a <min_populacao>
         // 1. Dividir a string por partes divido por cada espaço " "
@@ -374,7 +372,6 @@ public class Main {
                 return new Result(false, "Comando invalido", null);
             }
         }
-
         // ==================== GET_CITIES_BY_COUNTRY ==========================
         if (comando.startsWith("GET_CITIES_BY_COUNTRY")) {
             String[] partes = comando.split(" ", 3); // Limite 3 para se houver paises com espaço
@@ -426,17 +423,33 @@ public class Main {
 
 
         }
-
         // ==================== SUM_POPULATIONS ==========================
         // Recebe uma lista de países separadao por vírgulas,  também se pode pedir um só país
         // O comando pega nos países da lista e a partir do alfa ligado com o ficheiro populações
         // vai buscar a população e soma a M e F de cada país
+        // ==================== SUM_POPULATIONS ==========================
+        // ==================== SUM_POPULATIONS ==========================
+        // ==================== SUM_POPULATIONS ==========================
         if (comando.startsWith("SUM_POPULATIONS")) {
             String[] partes = comando.split(" ", 2);
 
             if (partes.length != 2) {
                 return new Result(false, "Comando invalido", null);
             }
+
+            // Descobrir o ano mais recente presente nos dados ("ano atual")
+            int anoAtual = Integer.MIN_VALUE;
+            for (Populacao pop : populacoes) {
+                try {
+                    int ano = Integer.parseInt(pop.ano.trim());
+                    if (ano > anoAtual) {
+                        anoAtual = ano;
+                    }
+                } catch (NumberFormatException e) {
+                    // ignora anos malformados
+                }
+            }
+            String anoAtualStr = String.valueOf(anoAtual);
 
             String[] nomesPaises = partes[1].split(",");
 
@@ -455,13 +468,14 @@ public class Main {
                     }
                 }
 
+                // País inválido -> erro com o nome dado
                 if (paisEncontrado == null) {
-                    return new Result(false, "Pais invalido : " + nomePais, null);
+                    return new Result(true, "Pais invalido: " + nomePais, null);
                 }
 
-                // Somar populações do país
+                // Somar apenas o ano mais recente
                 for (Populacao pop : populacoes) {
-                    if (pop.id == paisEncontrado.getId()) {
+                    if (pop.id == paisEncontrado.getId() && pop.ano.equals(anoAtualStr)) {
                         totalMasculina += pop.masculina;
                         totalFeminina += pop.feminina;
                     }
@@ -470,7 +484,6 @@ public class Main {
 
             return new Result(true, null, totalMasculina + totalFeminina + "");
         }
-
         // ==================== GET_HISTORY ==========================
         if (comando.startsWith("GET_HISTORY")) {
             String[] partes = comando.split(" ", 4);
@@ -528,7 +541,7 @@ public class Main {
                 if (resultStr.isEmpty()) {
                     return new Result(false, null, "Sem resultados");
                 } else {
-                    return new Result(true, null, resultStr.toString().trim());
+                    return new Result(true, null, resultStr.toString());
                 }
 
             } catch (NumberFormatException e) {
@@ -598,7 +611,7 @@ public class Main {
                     }
                 }
 
-                return new Result(true, null, resultStr.toString().trim());
+                return new Result(true, null, resultStr.toString());
 
             } catch (NumberFormatException e) {
                 return new Result(false, "Comando invalido", null);
@@ -627,7 +640,7 @@ public class Main {
                 }
 
                 if (targetAlfa2 == null) {
-                    return new Result(false, "Pais invalido: " + nomePais, null);
+                    return new Result(true, "Pais invalido: " + nomePais, null);
                 }
 
                 // —— -- FILTER CITIES -- ——
@@ -655,13 +668,76 @@ public class Main {
                 StringBuilder resultStr = new StringBuilder();
                 int limit = (numResults == -1) ? cidadesDoPais.size() : Math.min(numResults, cidadesDoPais.size());
 
+                for (int i = 0; i < limit; i++) {
+                    Cidade c = cidadesDoPais.get(i);
+                    int popK = c.populacao / 1000;
+                    resultStr.append(c.nome).append(":").append(popK).append("K").append("\n");
+                }
+
+                return new Result(true, null, resultStr.toString());
+
+            }catch (NumberFormatException e){
+                return new Result(false, "Comando invalido", null);
             }
-
-
         }
         // ==================== GET_DUPLICATE_CITIES ==========================
-        if (comando.startsWith("GET_DUPLICATE_CITIES")) {
+        if (comando.startsWith("GET_DUPLICATE_CITIES")
+                && !comando.startsWith("GET_DUPLICATE_CITIES_DIFFERENT_COUNTRIES")) {
 
+            String[] pieces = comando.split(" ");
+
+            if (pieces.length != 2) {
+                return new Result(false, "Comando invalido", null);
+            }
+
+            try {
+                int minPopulacao = Integer.parseInt(pieces[1].trim());
+
+                StringBuilder resultStr = new StringBuilder();
+                HashSet<String> nomesVistos = new HashSet<>();
+
+                // Percorre as cidades por ordem de leitura do ficheiro
+                for (Cidade c : cidades) {
+                    // Só consideramos cidades com população >= ao limite
+                    if (c.populacao < minPopulacao) {
+                        continue;
+                    }
+
+                    // Primeira ocorrência = "original" -> guarda e ignora
+                    if (!nomesVistos.contains(c.nome)) {
+                        nomesVistos.add(c.nome);
+                        continue;
+                    }
+
+                    // Ocorrências seguintes com o mesmo nome = duplicados -> output
+                    String nomePais = "";
+                    int idPais = -1;
+                    for (Pais p : paises) {
+                        if (p.getAlfa2().equals(c.alfa2)) {
+                            nomePais = p.nome;
+                            idPais = p.getId();
+                            break;
+                        }
+                    }
+
+
+                    resultStr.append(c.nome)
+                            .append(" (")
+                            .append(nomePais)
+                            .append(",")
+                            .append(idPais)
+                            .append(")\n");
+                }
+
+                if (resultStr.isEmpty()) {
+                    return new Result(false, null, "Sem resultados");
+                }
+
+                return new Result(true, null, resultStr.toString());
+
+            } catch (NumberFormatException e) {
+                return new Result(false, "Comando invalido", null);
+            }
         }
         // ==================== GET_COUNTRIES_GENDER_GAP ==========================
         if (comando.startsWith("GET_COUNTRIES_GENDER_GAP")) {
@@ -681,11 +757,83 @@ public class Main {
         }
         // ==================== INSERT_CITY ==========================
         if (comando.startsWith("INSERT_CITY")) {
+            String[] partes = comando.split(" ");
+            if (partes.length != 5) {
+                return new Result(false, "Comando invalido", null);
+            }
 
+            String alfa2Input = partes[1].trim();
+            String nome = partes[2].trim();
+            String regiao = partes[3].trim();
+
+
+            String alfa2 = null;
+            for (Pais p : paises) {
+                if (p.getAlfa2().equalsIgnoreCase(alfa2Input)) {
+                    alfa2 = p.getAlfa2();
+                    break;
+                }
+            }
+            if (alfa2 == null) {
+                return new Result(true, null, "Pais invalido");
+            }
+
+            try {
+                int populacao = (int) Double.parseDouble(partes[4].trim());
+                Cidade nova = new Cidade(alfa2, nome, regiao, populacao, 0.0, 0.0);
+                cidades.add(nova);
+                return new Result(true, null, "Inserido com sucesso");
+            } catch (NumberFormatException e) {
+                return new Result(false, "Comando invalido", null);
+            }
         }
         // ==================== REMOVE_COUNTRY ==========================
+        // ==================== REMOVE_COUNTRY ==========================
         if (comando.startsWith("REMOVE_COUNTRY")) {
+            String[] partes = comando.split(" ", 2); // limite 2 para nomes com espaços
 
+            if (partes.length != 2) {
+                return new Result(false, "Comando invalido", null);
+            }
+
+            String nomePais = partes[1].trim();
+
+            // Encontrar o país pelo nome
+            Pais paisEncontrado = null;
+            for (Pais p : paises) {
+                if (p.nome.equalsIgnoreCase(nomePais)) {
+                    paisEncontrado = p;
+                    break;
+                }
+            }
+
+            if (paisEncontrado == null) {
+                return new Result(false, "Pais invalido", null);
+            }
+
+            int idPais = paisEncontrado.getId();
+            String alfa2Pais = paisEncontrado.getAlfa2();
+
+            // Remover o país
+            paises.remove(paisEncontrado);
+
+            // Remover em cascata as cidades desse país
+            Iterator<Cidade> itCidades = cidades.iterator();
+            while (itCidades.hasNext()) {
+                if (itCidades.next().alfa2.equals(alfa2Pais)) {
+                    itCidades.remove();
+                }
+            }
+
+            // Remover em cascata os dados de população desse país
+            Iterator<Populacao> itPop = populacoes.iterator();
+            while (itPop.hasNext()) {
+                if (itPop.next().id == idPais) {
+                    itPop.remove();
+                }
+            }
+
+            return new Result(true, null, "Removido com sucesso");
         }
         // ==================== Comando Criativo ==========================
 
