@@ -319,12 +319,15 @@ public class Main {
     }
 
     public static Result execute(String comando) {
-        // ==================== QUIT ==========================
         if (comando.equals("QUIT")) {
+            // Descrição :
+            // Comando para fechar a aplicação e o programa no Terminal.
             return new Result(true, null, "!Closing the Program");
-        }
-        // ==================== HELP ==========================
+        } // Done & Commented
+
         if (comando.equals("HELP")) {
+            // Descrição :
+            // Função para mostrar ao utlizador os comandos que pode utilizar no nosso programa
             String helpcommand = "======================================= \n" +
                     "Available commands: \n" +
                     "\"COUNT_CITIES\" <min_population> \n" +
@@ -344,25 +347,32 @@ public class Main {
                     "\"HELP\" - Shows this help message \n" +
                     "\"QUIT\" - Exits the program";
             return new Result(true, null, helpcommand);
-        }
-        // ==================== COUNT_CITIES ==========================
-        // Comportamento do Comando : Conta cidades com população >= a <min_populacao>
-        // 1. Dividir a string por partes divido por cada espaço " "
-        // 2. Verificar se o comando foi bem escrito neste caso tem duas partes COUNT_CITIES e <min_population>
-        // 3. Dentro de um try, catch passar pelas cidades e ver qual cidade a população é >= a <min_population> e a partir daí aumentar o count
+        } // Done & Commented
+
         if (comando.startsWith("COUNT_CITIES")) {
+            // Descrição:
+            // Este comando deve contar as cidades com população >= a <min_populacao>
+            // Uso do Comando : COUNT_CITIES <min_population>
+
+            // Dividir a String pelas suas partes
+            // [0] -> Comando
+            // [1] -> min_population
             String[] partes = comando.split(" ");
 
+            // Verificar se o comando tem apenas 2 partes
             if (partes.length != 2) {
                 return new Result(false, "Comando invalido", null);
             }
 
             try {
+                // Ir buscar o dado que precisamos a partes[]
                 int minPopulacao = Integer.parseInt(partes[1].trim());
                 int count = 0;
 
+                // Iterar pela lista de cidades e contar quantas cidades tem populacao >= a min_populacao
                 for (Cidade c : cidades) {
                     if (c.populacao >= minPopulacao) {
+                        // Adicionar cada cidade ao count para conseguirmos dar o resultado ao user
                         count++;
                     }
                 }
@@ -371,16 +381,28 @@ public class Main {
             } catch (NumberFormatException e) {
                 return new Result(false, "Comando invalido", null);
             }
-        }
-        // ==================== GET_CITIES_BY_COUNTRY ==========================
-        if (comando.startsWith("GET_CITIES_BY_COUNTRY")) {
-            String[] partes = comando.split(" ", 3); // Limite 3 para se houver paises com espaço
+        } // Done & Commented
 
+        if (comando.startsWith("GET_CITIES_BY_COUNTRY")) {
+            // Descrição:
+            // Este comando recebe um paíse e um num_results, a partir do país o comando
+            // deve procurar quantas(num dado pelo user) cidades este país tem com a conexão do alfa2
+            // Uso do Comando : GET_CITIES_BY_COUNTRY <num_results> <country_name>
+
+            // Dividir as partes, dividimos em 3 porque podem ser pedidos países com espaço
+            // [0] -> comando
+            // [1] -> <num_results>
+            // [2] -> <country_name>
+            // [3] -> Só usado se o país tiver um espaço no seu nome
+            String[] partes = comando.split(" ", 3);
+
+            // Validar as partes do comando pedido pelo User
             if (partes.length != 3) {
                 return new Result(false, "Comando invalido", null);
             }
 
             try {
+                // Ir buscar as variáveis necesssárias as partes[] do comando
                 int numResults = Integer.parseInt(partes[1].trim());
                 String nomePais = partes[2].trim();
 
@@ -388,9 +410,12 @@ public class Main {
                 boolean paisValido = false;
                 String alfa2Pais = null;
 
+                // Iterar pela lista de países, se for encontrado algum nome igual à nossa variável
+                // nomePais validamos a variável paisValido para indicar que o pais foi encontrado
                 for (Pais p : paises) {
                     if (p.nome.equalsIgnoreCase(nomePais)) {
                         paisValido = true;
+                        // Aqui damos o Alfa2 do pais encontrado à nossa variável
                         alfa2Pais = p.getAlfa2();
                         break;
                     }
@@ -402,6 +427,8 @@ public class Main {
 
                 // Encontrar a cidade para o país que o user deu
                 ArrayList<Cidade> cidadesDoPais = new ArrayList<>();
+                // Iterar pelas cidades para encontrar quantas cidades(alfa2) estao conectadas com
+                // o país que o user pediu
                 for (Cidade c : cidades) {
                     if (c.alfa2.equals(alfa2Pais)) {
                         cidadesDoPais.add(c);
@@ -422,33 +449,42 @@ public class Main {
             }
 
 
-        }
-        // ==================== SUM_POPULATIONS ==========================
-        // Recebe uma lista de países separadao por vírgulas,  também se pode pedir um só país
-        // O comando pega nos países da lista e a partir do alfa ligado com o ficheiro populações
-        // vai buscar a população e soma a M e F de cada país
-        // ==================== SUM_POPULATIONS ==========================
-        // ==================== SUM_POPULATIONS ==========================
-        // ==================== SUM_POPULATIONS ==========================
+        } // Done & Commented
+
         if (comando.startsWith("SUM_POPULATIONS")) {
+            // Descrição :
+            // Recebe uma lista de países separada por vírgulas, também se pode pedir um só país.
+            // O comando pega nos países da lista e a partir do alfa ligado com o ficheiro populações
+            // vai buscar a população e soma a M e F de cada país
+            // Uso do Comando : SUM_POPULATIONS <countries_list>
+
+            // Divisão do comando
+            // [0] -> Comando
+            // [1] -> countries_list
             String[] partes = comando.split(" ", 2);
 
+            // Validação das partes que existem no comando
             if (partes.length != 2) {
                 return new Result(false, "Comando invalido", null);
             }
 
             // Descobrir o ano mais recente presente nos dados ("ano atual")
             int anoAtual = Integer.MIN_VALUE;
+            // Iterar pela lista de populacoes
             for (Populacao pop : populacoes) {
                 try {
+                    // Passa a string do ano para Int
                     int ano = Integer.parseInt(pop.ano.trim());
-                    if (ano > anoAtual) {
+                    // Verifica todos os anos do ficheiro em  INT se sao maiores que o anoAtual e menores
+                    // que 2026
+                    if (ano > anoAtual && ano <= 2026) {
                         anoAtual = ano;
                     }
                 } catch (NumberFormatException e) {
                     // ignora anos malformados
                 }
             }
+
             String anoAtualStr = String.valueOf(anoAtual);
 
             String[] nomesPaises = partes[1].split(",");
@@ -470,7 +506,7 @@ public class Main {
 
                 // País inválido -> erro com o nome dado
                 if (paisEncontrado == null) {
-                    return new Result(true, "Pais invalido: " + nomePais, null);
+                    return new Result(true, null, "Pais invalido: " + nomePais);
                 }
 
                 // Somar apenas o ano mais recente
@@ -484,17 +520,81 @@ public class Main {
 
             return new Result(true, null, totalMasculina + totalFeminina + "");
         }
-        // ==================== GET_HISTORY ==========================
+
         if (comando.startsWith("GET_HISTORY")) {
+            // Comando : GET_HISTORY <year_start> <year_end> <country_name>
+
+            // —— -- Divisão do comando em 4 partes -- ——
+            // [0] -> Comando
+            // [1] -> year_start
+            // [2] -> year_end
+            // [3] -> country_name
             String[] partes = comando.split(" ", 4);
 
+            // —— -- Verificação do comando se tem os supostos 4 campos -- ——
             if (partes.length != 4){
                 return new Result(false, "Comando invalido", null);
             }
 
+            // —— -- Obter as variáveis necessárias -- ——
+            String year_start = partes[1];
+            String year_end = partes[2];
+            String nomePais = partes[3];
 
-        }
-        // ==================== GET_MISSING_HISTORY ==========================
+            // —— --  -- ——
+            try {
+                // —— -- Encontrar o país -- ——
+                Pais paisEncontrado = null;
+                for (Pais p : paises) { // Este for itera por todos os países que temos no programa
+                    if (p.nome.equalsIgnoreCase(nomePais)){ // Vê se o nome do p é igual ao que recebemos no comando
+                        paisEncontrado = p; // Guardar o país
+                        break;
+                    }
+                }
+                // —— -- Validar o país -- ——
+                // Se o paisEncontrado não tiver recebido nenhum valor no for() anterior
+                // podemos concluir que o país não foi encontrado na nossa lista de países.
+                if(paisEncontrado == null){
+                    return new Result(true,null,"Pais Invalido: " + nomePais);
+                }
+                // —— -- Converter os Anos -- ——
+                // Temos que converter os Anos que estão em texto para int's
+                int yearStartInt = Integer.parseInt(year_start.trim());
+                int yearEndInt = Integer.parseInt(year_end.trim());
+                // —— -- Percorrer os Anos -- ——
+                int idPais = paisEncontrado.getId(); // Guardar ID do país
+                StringBuilder sb = new StringBuilder();
+
+                // Iterar pelos anos todos entre o year_start e o year_end
+                for (int year = yearStartInt; year <= yearEndInt; year++){
+                    for (Populacao pop : populacoes){
+                        // pop.id == idPais -> Esta linha é do meu Pais ?
+                        // pop.ano.equals(String.valueOf(year)) -> Esta linha é do Ano que estou a procurar agora ?
+                        if(pop.id == idPais && pop.ano.equals(String.valueOf(year))){
+                            // —— -- Formatar -- ——
+                            long mascK = pop.masculina / 1000; // Para fazer o output pedido
+                            long femK = pop.feminina / 1000;
+
+                            sb.append(year).append(":")
+                                    .append(mascK).append("k:")
+                                    .append(femK).append("k")
+                                    .append("\n");
+                            break;
+                        }
+                    }
+                }
+
+                // —— -- Devolver o resultado -- ——
+                return new Result(true, null, sb.toString());
+
+            }catch (NumberFormatException e){
+                // Apanhar o erro que pode acontecer na parte de converter os Anos para int
+                return new Result(false,"Comando invaido",null);
+            }
+
+
+        } // Done & Commented
+
         if (comando.startsWith("GET_MISSING_HISTORY")) {
             String[] pieces = comando.split(" ");
 
@@ -548,7 +648,7 @@ public class Main {
                 return new Result(false, "Comando invalido", null);
             }
         }
-        // ==================== GET_MOST_POPULOUS ==========================
+
         if (comando.startsWith("GET_MOST_POPULOUS")) {
             String[] pieces = comando.split(" ");
 
@@ -618,7 +718,7 @@ public class Main {
             }
 
         }
-        // ==================== GET_TOP_CITIES_BY_COUNTRY ==========================
+
         if (comando.startsWith("GET_TOP_CITIES_BY_COUNTRY")) {
             String[] pieces = comando.split(" ", 3);
 
@@ -660,7 +760,8 @@ public class Main {
                             return c2.populacao - c1.populacao; // pop desc
                         }
 
-                        return c2.nome.compareTo(c1.nome); // name desc
+                        // Empate -> ordem alfabética ascendente -> Antes estava ordem descendente
+                        return c1.nome.compareTo(c2.nome);
                     }
                 });
 
@@ -680,7 +781,7 @@ public class Main {
                 return new Result(false, "Comando invalido", null);
             }
         }
-        // ==================== GET_DUPLICATE_CITIES ==========================
+
         if (comando.startsWith("GET_DUPLICATE_CITIES")
                 && !comando.startsWith("GET_DUPLICATE_CITIES_DIFFERENT_COUNTRIES")) {
 
@@ -739,23 +840,23 @@ public class Main {
                 return new Result(false, "Comando invalido", null);
             }
         }
-        // ==================== GET_COUNTRIES_GENDER_GAP ==========================
+
         if (comando.startsWith("GET_COUNTRIES_GENDER_GAP")) {
 
         }
-        // ==================== GET_TOP_POPULATION_INCREASE ==========================
+
         if (comando.startsWith("GET_TOP_POPULATION_INCREASE")) {
 
         }
-        // ==================== GET_DUPLICATE_CITIES_DIFFERENT_COUNTRIES ==========================
+
         if (comando.startsWith("GET_DUPLICATE_CITIES_DIFFERENT_COUNTRIES")) {
 
         }
-        // ==================== GET_CITIES_AT_DISTANCE ==========================
+
         if (comando.startsWith("GET_CITIES_AT_DISTANCE")) {
 
         }
-        // ==================== INSERT_CITY ==========================
+
         if (comando.startsWith("INSERT_CITY")) {
             String[] partes = comando.split(" ");
             if (partes.length != 5) {
@@ -787,8 +888,7 @@ public class Main {
                 return new Result(false, "Comando invalido", null);
             }
         }
-        // ==================== REMOVE_COUNTRY ==========================
-        // ==================== REMOVE_COUNTRY ==========================
+
         if (comando.startsWith("REMOVE_COUNTRY")) {
             String[] partes = comando.split(" ", 2); // limite 2 para nomes com espaços
 
@@ -835,6 +935,7 @@ public class Main {
 
             return new Result(true, null, "Removido com sucesso");
         }
+
         // ==================== Comando Criativo ==========================
 
 
