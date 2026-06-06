@@ -227,8 +227,8 @@ public class Main {
                     try {
                         int id = Integer.parseInt(data[0].trim());
                         String ano = data[1].trim();
-                        long masculina = Long.parseLong(data[2].trim());
-                        long feminina = Long.parseLong(data[3].trim());
+                        long masculina = (long) Double.parseDouble(data[2].trim());
+                        long feminina  = (long) Double.parseDouble(data[3].trim());
                         double densidade = Double.parseDouble((data[4].trim()));
 
                         // validates if país id exists first
@@ -842,7 +842,88 @@ public class Main {
         }
 
         if (comando.startsWith("GET_COUNTRIES_GENDER_GAP")) {
+            // Descrição :
+            // Este comando recebe um min_gender_gap e , calcula
+            // um número que mede o desiquilibreo entre populacao masculina e feminina
+            // Formula : Imbalance = ( |masculina - feminina|  /  (masculina + feminina) ) × 100
+            // O resultado vem em 2 casas decimais sem arredondar, depois o output do comando
+            // só vai ser dado quando este valor Imbalance >= <min_gender_gap>
+            // Uso do Comando : GET_COUNTRIES_GENDER_GAP <min_gender_gap>
 
+            // Divisao do comando
+            // [0] -> Comando
+            // [1] -> min_gender_gap
+            String[] partes = comando.split(" ");
+
+            // Validar o tamanho (2 partes)
+            if(partes.length != 2){
+                return new Result(false, "Comando Invalido",null);
+            }
+
+            try{
+                // Converter o min_gender_gap para INT
+                int minGap = Integer.parseInt(partes[1].trim());
+
+                // Descobrir o Ano Atual (Copiado do comando SUM_POPULATIONS)
+                int anoAtual = Integer.MIN_VALUE;
+                for (Populacao pop : populacoes) {
+                    try {
+                        int ano = Integer.parseInt(pop.ano.trim());
+                        if (ano > anoAtual && ano <= 2026) {
+                            anoAtual = ano;
+                        }
+                    } catch (NumberFormatException e) {
+                        // ignora anos malformados
+                    }
+                }
+                String anoAtualStr = String.valueOf(anoAtual);
+                // Setup inicial do String Builder
+                StringBuilder sb = new StringBuilder();
+
+                // Iterar pela lista de paises dos dados que temos
+                for(Pais p : paises){
+                    // Somar população feminina e masculina deste país, no ano atual
+                    long masc = 0;
+                    long fem = 0;
+                    for (Populacao pop : populacoes){
+                        if(pop.id == p.getId() && pop.ano.equals(anoAtualStr)){
+                            masc += pop.masculina;
+                            fem += pop.feminina;
+                        }
+                    }
+                    long total = masc + fem;
+                    if(total == 0){
+                        continue; // Sem dados para o país que esta a ver salta o país
+                    }
+
+                    // Calcular o Imbalance
+                    double imbalance = ((double) Math.abs(masc - fem) / total) * 100.0;
+
+                    // Filtrar pelo threshold
+                    if (imbalance >= minGap) {
+                        // Truncar a 2 casas decimais (sem arredondar) com aritmética inteira
+                        long porCem = (long) (imbalance * 100);   // Ex: 1.857 -> 185
+                        long inteiro = porCem / 100;              // Ex: 185 / 100 -> 1
+                        long decimal = porCem % 100;              // Ex: 185 % 100 -> 85
+
+                        sb.append(p.nome).append(": ")
+                                .append(inteiro).append(".")
+                                .append(decimal < 10 ? "0" + decimal : decimal)
+                                .append("\n");
+                    }
+                }
+
+                // Devolver o resultado
+                if (sb.length() == 0) {
+                    return new Result(true, null, "Sem resultados");
+                }
+                return new Result(true, null, sb.toString());
+
+
+
+            }catch (NumberFormatException e){
+                return new Result(false, "Comando Invalido",null);
+            }
         }
 
         if (comando.startsWith("GET_TOP_POPULATION_INCREASE")) {
@@ -858,6 +939,8 @@ public class Main {
         }
 
         if (comando.startsWith("INSERT_CITY")) {
+            // Descrição :
+            //
             String[] partes = comando.split(" ");
             if (partes.length != 5) {
                 return new Result(false, "Comando invalido", null);
