@@ -764,12 +764,12 @@ public class Main {
                 cidadesDoPais.sort(new Comparator<Cidade>() {
                     @Override
                     public int compare(Cidade c1, Cidade c2) {
-                        if (c1.populacao != c2.populacao) {
-                            return c2.populacao - c1.populacao; // pop desc
+                        int k1 = c1.populacao / 1000;     // população já truncada em K
+                        int k2 = c2.populacao / 1000;
+                        if (k1 != k2) {
+                            return k2 - k1;                // K desc
                         }
-
-                        // Empate -> ordem alfabética ascendente -> Antes estava ordem descendente
-                        return c1.nome.compareTo(c2.nome);
+                        return c1.nome.compareTo(c2.nome); // empate em K -> nome ascendente
                     }
                 });
 
@@ -820,11 +820,9 @@ public class Main {
 
                     // Ocorrências seguintes com o mesmo nome = duplicados -> output
                     String nomePais = "";
-                    int idPais = -1;
                     for (Pais p : paises) {
                         if (p.getAlfa2().equals(c.alfa2)) {
                             nomePais = p.nome;
-                            idPais = p.getId();
                             break;
                         }
                     }
@@ -834,7 +832,7 @@ public class Main {
                             .append(" (")
                             .append(nomePais)
                             .append(",")
-                            .append(idPais)
+                            .append(c.regiao)
                             .append(")\n");
                 }
 
