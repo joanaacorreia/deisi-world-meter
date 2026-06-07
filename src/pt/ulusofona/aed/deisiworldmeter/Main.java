@@ -905,7 +905,7 @@ public class Main {
 
                     // Calcular o Imbalance
                     long absDiff = Math.abs(masc - fem);
-                    long imbalanceTimes100 = (absDiff * 10000) / total;  // <- inteiro x inteiro / inteiro
+                    long imbalanceTimes100 = (absDiff * 10000 + total / 2) / total;  // <- inteiro x inteiro / inteiro
 
                     // Filtrar pelo threshold
                     if (imbalanceTimes100 >= (long) minGap * 100) {
