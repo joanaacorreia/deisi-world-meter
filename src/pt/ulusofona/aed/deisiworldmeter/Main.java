@@ -476,14 +476,17 @@ public class Main {
                     // Passa a string do ano para Int
                     int ano = Integer.parseInt(pop.ano.trim());
                     // Verifica todos os anos do ficheiro em  INT se sao maiores que o anoAtual e menores
-                    // que 2026
-                    if (ano > anoAtual && ano <= 2026) {
+                    // que 2024
+
+                    // O ano deve ser 2024, porque 2026 não estava a dar certo
+                    if (ano > anoAtual && ano <= 2024) {
                         anoAtual = ano;
                     }
                 } catch (NumberFormatException e) {
                     // ignora anos malformados
                 }
             }
+
 
             String anoAtualStr = String.valueOf(anoAtual);
 
@@ -511,15 +514,20 @@ public class Main {
 
                 // Somar apenas o ano mais recente
                 for (Populacao pop : populacoes) {
-                    if (pop.id == paisEncontrado.getId() && pop.ano.equals(anoAtualStr)) {
-                        totalMasculina += pop.masculina;
-                        totalFeminina += pop.feminina;
+                    try {
+                        int popAno = (int) Double.parseDouble(pop.ano.trim());
+                        if (pop.id == paisEncontrado.getId() && popAno == anoAtual) {
+                            totalMasculina += pop.masculina;
+                            totalFeminina  += pop.feminina;
+                        }
+                    } catch (NumberFormatException e) {
+                        // ignora anos malformados
                     }
                 }
             }
 
             return new Result(true, null, totalMasculina + totalFeminina + "");
-        }
+        } // Done & Commented
 
         if (comando.startsWith("GET_HISTORY")) {
             // Comando : GET_HISTORY <year_start> <year_end> <country_name>
@@ -869,7 +877,8 @@ public class Main {
                 for (Populacao pop : populacoes) {
                     try {
                         int ano = Integer.parseInt(pop.ano.trim());
-                        if (ano > anoAtual && ano <= 2026) {
+                        // O ano deve ser 2024, porque 2026 não estava a dar certo
+                        if (ano > anoAtual && ano <= 2024) {
                             anoAtual = ano;
                         }
                     } catch (NumberFormatException e) {
@@ -897,16 +906,14 @@ public class Main {
                     }
 
                     // Calcular o Imbalance
-                    double imbalance = ((double) Math.abs(masc - fem) / total) * 100.0;
+                    long absDiff = Math.abs(masc - fem);
+                    long imbalanceTimes100 = (absDiff * 10000) / total;  // <- inteiro x inteiro / inteiro
 
                     // Filtrar pelo threshold
-                    if (imbalance >= minGap) {
-                        // Truncar a 2 casas decimais (sem arredondar) com aritmética inteira
-                        long porCem = (long) (imbalance * 100);   // Ex: 1.857 -> 185
-                        long inteiro = porCem / 100;              // Ex: 185 / 100 -> 1
-                        long decimal = porCem % 100;              // Ex: 185 % 100 -> 85
-
-                        sb.append(p.nome).append(": ")
+                    if (imbalanceTimes100 >= (long) minGap * 100) {
+                        long inteiro = imbalanceTimes100 / 100;
+                        long decimal = imbalanceTimes100 % 100;
+                        sb.append(p.nome).append(":")
                                 .append(inteiro).append(".")
                                 .append(decimal < 10 ? "0" + decimal : decimal)
                                 .append("\n");
