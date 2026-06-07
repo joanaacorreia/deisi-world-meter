@@ -931,17 +931,10 @@ public class Main {
             }
         }
 
-        if (comando.startsWith("GET_TOP_POPULATION_INCREASE")) {
-
-        }
-
-        if (comando.startsWith("GET_DUPLICATE_CITIES_DIFFERENT_COUNTRIES")) {
-
-        }
-
-        if (comando.startsWith("GET_CITIES_AT_DISTANCE")) {
-
-        }
+        // Faltaram os comandos :
+        // -> GET_TOP_POPULATION_INCREASE
+        // -> GET_DUPLICATE_CITIES_DIFFERENT_COUNTRIES
+        // -> GET_CITIES_AT_DISTANCE
 
         if (comando.startsWith("INSERT_CITY")) {
             // Descrição :
