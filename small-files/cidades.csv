@@ -1,0 +1,17 @@
+alfa2,cidade,regiao,populacao,latitude,longitude
+pt,lisboa,11,500000.0,38.7167,-9.1333
+pt,porto,13,250000.0,41.15,-8.6167
+pt,faro,08,60000.0,37.0167,-7.935
+pt,san jose,07,40000.0,38.5,-9.0
+pt,san jose,06,30000.0,39.0,-8.5
+pt,achu,08,,33.0,67.0
+es,madrid,01,3000000.0,40.4,-3.7
+es,barcelona,02,1600000.0,41.38,2.17
+es,san jose,03,20000.0,38.9,-9.1
+es,valencia,04,800000.0,39.47,-0.38
+fr,paris,01,2100000.0,48.85,2.35
+fr,lyon,02,500000.0,45.76,4.83
+fr,porto,03,15000.0,46.0,3.0
+ad,andorra la vella,07,20430.0,42.5,1.5167
+ad,encamp,03,11224.0,42.533,1.583
+xx,cidadefantasma,01,1000.0,0.0,0.0

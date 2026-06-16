@@ -604,13 +604,21 @@ public class Main {
         } // Done & Commented
 
         if (comando.startsWith("GET_MISSING_HISTORY")) {
+            // Descrição do Comando :
+            // Lista os países a que falta o registo da população em pelo menos um ano dentro do
+            // intervalo pedido pelo user
+
+            // Divisão do comando a partir de espaços
+            // Uso do Comando: GET_MISSING_HISTORY <year_start> <year_end>
             String[] pieces = comando.split(" ");
 
+            // Verificação do comando para saber se tem os 3 parâmetros que queremos
             if (pieces.length != 3) {
                 return new Result(false, "Comando invalido", null);
             }
 
             try {
+                // Recolher as variáveis com a ajuda do split feito no início
                 int yearStart = Integer.parseInt(pieces[1]);
                 int yearEnd = Integer.parseInt(pieces[2]);
 
@@ -655,7 +663,7 @@ public class Main {
             } catch (NumberFormatException e) {
                 return new Result(false, "Comando invalido", null);
             }
-        }
+        } // Done & Commented
 
         if (comando.startsWith("GET_MOST_POPULOUS")) {
             String[] pieces = comando.split(" ");
@@ -947,17 +955,24 @@ public class Main {
 
         if (comando.startsWith("INSERT_CITY")) {
             // Descrição :
-            //
+            // Este comando acrescenta uma cidade nova ao ArrayList cidades mas só enquanto o programa
+            // está a correr, após fechar o programa esse país nunca vai aparecer no ficheiro
+            // A cidade é apenas criada para uma uníca sessão do programa
+
+            // Uso do Comando : INSERT_CITY <alfa2> <city_name> <region> <population>
+
+            // Divisão e Validação das partes do comando
             String[] partes = comando.split(" ");
             if (partes.length != 5) {
                 return new Result(false, "Comando invalido", null);
             }
-
+            // Guardar as variáveis necessárias a partir do split()
             String alfa2Input = partes[1].trim();
             String nome = partes[2].trim();
             String regiao = partes[3].trim();
 
-
+            // Aqui validamos se o país onde queremos adicionar a cidade existe ou seja vemos se o alfa2
+            // dado pelo User é igual a algum na nossa base de dados/ ArrayList dos países
             String alfa2 = null;
             for (Pais p : paises) {
                 if (p.getAlfa2().equalsIgnoreCase(alfa2Input)) {
@@ -969,6 +984,8 @@ public class Main {
                 return new Result(true, null, "Pais invalido");
             }
 
+            // Aqui tentamos(try/catch) adicionar a cidade ao arrayList das Cidades se tudo for válido
+            // consoante a classe Cidade
             try {
                 int populacao = (int) Double.parseDouble(partes[4].trim());
                 Cidade nova = new Cidade(alfa2, nome, regiao, populacao, 0.0, 0.0);
@@ -977,10 +994,11 @@ public class Main {
             } catch (NumberFormatException e) {
                 return new Result(false, "Comando invalido", null);
             }
-        }
+        } // Done & Commented
 
         if (comando.startsWith("REMOVE_COUNTRY")) {
             String[] partes = comando.split(" ", 2); // limite 2 para nomes com espaços
+
 
             if (partes.length != 2) {
                 return new Result(false, "Comando invalido", null);
@@ -1026,6 +1044,7 @@ public class Main {
             return new Result(true, null, "Removido com sucesso");
         }
 
+
         // ==================== Comando Criativo ==========================
 
 
@@ -1038,7 +1057,7 @@ public class Main {
         System.out.println("Welcome to Deisi World Meter");
 
         long start = System.currentTimeMillis();
-        boolean parseOk = parseFiles(new File("."));
+        boolean parseOk = parseFiles(new File("small-files"));
         if (!parseOk) {
             System.out.println("Error Loading Files");
             return;
